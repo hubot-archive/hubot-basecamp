@@ -1,8 +1,8 @@
-# hubot-basecamp
+# Basecamp in Hubot - hubot-basecamp
 
 Provides text previews of Basecamp URLs.
 
-See [`src/basecamp.coffee`](src/basecamp.coffee) for full documentation.
+![hubot-basecamp-demo](https://cloud.githubusercontent.com/assets/509217/5155887/0a6248a8-7263-11e4-9cb6-ae8d4c4b1742.png)
 
 ## Installation
 
