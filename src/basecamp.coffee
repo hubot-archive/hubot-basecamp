@@ -71,8 +71,7 @@ module.exports = (robot) ->
 
   # Respond to 'basecamp' or 'bcx' with what this guy does.
   robot.respond /basecamp|bcx/i, (msg) ->
-    if (!msg.match[1])
-      msg.send "Sit back and let me do the work. I'll expand todos and messages for you when you paste basecamp.com urls."
+    msg.send "Sit back and let me do the work. I'll expand todos and messages for you when you paste basecamp.com urls."
 
   # Display a single todo item.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
