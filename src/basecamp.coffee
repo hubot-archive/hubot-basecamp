@@ -71,7 +71,7 @@ module.exports = (robot) ->
 
   # Responsd to 'basecamp' with what this guy does.
   robot.respond /basecamp/, (msg) ->
-    msg.reply "Sit back and let me do the work. I'll expand todos and messages for you when you paste basecamp.com URLs."
+    msg.reply "Sit back and let me do the work. I'll expand todos and messages for you when you paste basecamp.com urls."
 
   # Display a single todo item.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
