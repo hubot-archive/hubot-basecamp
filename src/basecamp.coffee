@@ -80,6 +80,10 @@ module.exports = (robot) ->
     getRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
       response = JSON.parse body
       m = "*#{response.content}*"
+      if (response.attachments)
+        m = m + "\n_ Attached files: _"
+        for att in response.attachments
+          m = m + "\n *#{att.name}:* #{att.app_url}"
       if (response.assignee)
         m = m + "\n_ Assigned to #{response.assignee.name} _"
       if (response.comments)
@@ -89,6 +93,11 @@ module.exports = (robot) ->
           m = m + "\n_ The last comment was made by #{last.creator.name}: _"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
           m = m + "\n```#{comment}```"
+          if (last.attachments)
+            m = m + "\n_ Attached files: _"
+            for att in last.attachments
+              m = m + "\n *#{att.name}:* #{att.app_url}"
+
       msg.send m
 
   # Display the todo list name and item counts.
@@ -113,6 +122,10 @@ module.exports = (robot) ->
       if (response.content)
         body = totxt.fromString(response.content, { wordwrap: 70 });
         m = m + "\n```#{body}```"
+      if (response.attachments)
+        m = m + "\n_ Attached files: _"
+        for att in response.attachments
+          m = m + "\n *#{att.name}:* #{att.app_url}"
       if (response.comments)
         last = response.comments.pop()
         t = type last
@@ -120,4 +133,8 @@ module.exports = (robot) ->
           m = m + "\n_ The last comment was made by #{last.creator.name}: _"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
           m = m + "\n```#{comment}```"
+          if (last.attachments)
+            m = m + "\n_ Attached files: _"
+            for att in last.attachments
+              m = m + "\n *#{att.name}:* #{att.app_url}"
       msg.send m
