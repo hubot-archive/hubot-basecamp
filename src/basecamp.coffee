@@ -89,7 +89,7 @@ parseBasecampResponse = (msgtype, body) ->
       if (body.attachments.length > 0)
         m = m + "\n_ Files: _"
         for att in body.attachments
-          m = m + "\n:paperclip: <#{att.app_url}|#{att.name}>"
+          m = m + "\n<#{att.app_url}|#{att.name}>"
       if (body.assignee)
         m = m + "\n_ Assigned to #{body.assignee.name} _"
       if (body.comments)
@@ -102,7 +102,7 @@ parseBasecampResponse = (msgtype, body) ->
           if (last.attachments.length > 0)
             m = m + "\n_ Files: _"
             for att in last.attachments
-              m = m + "\n:paperclip: <#{att.app_url}|#{att.name}>"
+              m = m + "\n<#{att.app_url}|#{att.name}>"
 
     when "message"
       m = "*#{body.subject}*"
@@ -115,7 +115,7 @@ parseBasecampResponse = (msgtype, body) ->
         if (body.attachments.length > 0)
           m = m + "\n_ Files: _"
           for att in body.attachments
-            m = m + "\n:paperclip: <#{att.app_url}|#{att.name}>"
+            m = m + "\n<#{att.app_url}|#{att.name}>"
       if (body.comments)
         last = body.comments.pop()
         t = type last
@@ -126,7 +126,7 @@ parseBasecampResponse = (msgtype, body) ->
           if (last.attachments.length > 0)
             m = m + "\n_ Files: _"
             for att in last.attachments
-              m = m + "\n:paperclip: <#{att.app_url}|#{att.name}>"
+              m = m + "\n<#{att.app_url}|#{att.name}>"
 
   m
 
