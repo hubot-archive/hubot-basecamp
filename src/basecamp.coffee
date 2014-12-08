@@ -86,10 +86,14 @@ parseBasecampResponse = (msgtype, body) ->
       m = "*#{body.content}*"
       if (body.completed)
         m = m + " _ (COMPLETED) _"
-      if (body.attachments.length > 0)
-        m = m + "\n_ File(s): _"
+      attcnt = body.attachments.length
+      if (attcnt > 0)
+        if (attcnt == 1)
+          m = m + "\n_ 1 file _"
+        else
+          m = m + "\n_ #{attcnt} files _"
         for att in body.attachments
-          m = m + "\n#{att.app_url}|#{att.name}"
+          m = m + " #{att.app_url}|'#{att.name}'"
       if (body.assignee)
         m = m + "\n_ Assigned to #{body.assignee.name} _"
       if (body.comments)
@@ -99,10 +103,14 @@ parseBasecampResponse = (msgtype, body) ->
           m = m + "\n_ The last comment was made by #{last.creator.name}: _"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
           m = m + "\n```#{comment}```"
-          if (last.attachments.length > 0)
-            m = m + "\n_ File(s): _"
+          lstattcnt = last.attachments.length
+          if (lstattcnt > 0)
+            if (lstattcnt == 1)
+              m = m + "\n_ 1 file _"
+            else
+              m = m + "\n_ #{lstattcnt} files _"
             for att in last.attachments
-              m = m + "\n#{att.app_url}|#{att.name}"
+              m = m + " #{att.app_url}|'#{att.name}'"
 
     when "message"
       m = "*#{body.subject}*"
@@ -112,10 +120,14 @@ parseBasecampResponse = (msgtype, body) ->
         bd = totxt.fromString(body.content, { wordwrap: 70 });
         m = m + "\n```#{bd}```"
       if (body.attachments)
-        if (body.attachments.length > 0)
-          m = m + "\n_ File(s): _"
+        attcnt = body.attachments.length
+        if (attcnt > 0)
+          if (attcnt == 1)
+            m = m + "\n_ 1 file _"
+          else
+            m = m + "\n_ #{attcnt} files _"
           for att in body.attachments
-            m = m + "\n#{att.app_url}|#{att.name}"
+            m = m + " #{att.app_url}|'#{att.name}'"
       if (body.comments)
         last = body.comments.pop()
         t = type last
@@ -123,10 +135,14 @@ parseBasecampResponse = (msgtype, body) ->
           m = m + "\n_ The last comment was made by #{last.creator.name}: _"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
           m = m + "\n```#{comment}```"
-          if (last.attachments.length > 0)
-            m = m + "\n_ File(s): _"
+          lstattcnt = last.attachments.length
+          if (lstattcnt > 0)
+            if (lstattcnt == 1)
+              m = m + "\n_ 1 file _"
+            else
+              m = m + "\n_ #{lstattcnt} files _"
             for att in last.attachments
-              m = m + "\n#{att.app_url}|#{att.name}"
+              m = m + " #{att.app_url}|'#{att.name}'"
 
   m
 
