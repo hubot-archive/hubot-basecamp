@@ -89,11 +89,11 @@ parseBasecampResponse = (msgtype, body) ->
       attcnt = body.attachments.length
       if (attcnt > 0)
         if (attcnt == 1)
-          m = m + "\n_ 1 file _"
+          m = m + "\n_ 1 file: _"
         else
-          m = m + "\n_ #{attcnt} files _"
+          m = m + "\n_ #{attcnt} files: _"
         for att in body.attachments
-          m = m + " #{att.app_url}|'#{att.name}'"
+          m = m + "\n> #{att.name} (#{att.app_url}|download)"
       if (body.assignee)
         m = m + "\n_ Assigned to #{body.assignee.name} _"
       if (body.comments)
@@ -106,11 +106,11 @@ parseBasecampResponse = (msgtype, body) ->
           lstattcnt = last.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
-              m = m + "\n_ 1 file _"
+              m = m + "\n_ 1 file: _"
             else
-              m = m + "\n_ #{lstattcnt} files _"
+              m = m + "\n_ #{lstattcnt} files: _"
             for att in last.attachments
-              m = m + " #{att.app_url}|'#{att.name}'"
+              m = m + "\n> #{att.name} (#{att.app_url}|download)"
 
     when "message"
       m = "*#{body.subject}*"
@@ -123,11 +123,11 @@ parseBasecampResponse = (msgtype, body) ->
         attcnt = body.attachments.length
         if (attcnt > 0)
           if (attcnt == 1)
-            m = m + "\n_ 1 file _"
+            m = m + "\n_ 1 file: _"
           else
-            m = m + "\n_ #{attcnt} files _"
+            m = m + "\n_ #{attcnt} files: _"
           for att in body.attachments
-            m = m + " #{att.app_url}|'#{att.name}'"
+            m = m + "\n> #{att.name} (#{att.app_url}|download)"
       if (body.comments)
         last = body.comments.pop()
         t = type last
@@ -138,11 +138,11 @@ parseBasecampResponse = (msgtype, body) ->
           lstattcnt = last.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
-              m = m + "\n_ 1 file _"
+              m = m + "\n_ 1 file: _"
             else
-              m = m + "\n_ #{lstattcnt} files _"
+              m = m + "\n_ #{lstattcnt} files: _"
             for att in last.attachments
-              m = m + " #{att.app_url}|'#{att.name}'"
+              m = m + "\n> #{att.name} (#{att.app_url}|download)"
 
   m
 
