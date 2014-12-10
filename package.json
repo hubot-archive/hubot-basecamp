@@ -1,7 +1,7 @@
 {
   "name": "hubot-basecamp",
   "description": "Provides text previews of Basecamp URLs.",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Ivan Stegic <ivan.stegic@gmail.com>",
   "license": "MIT",
 
