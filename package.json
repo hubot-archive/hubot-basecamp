@@ -1,7 +1,7 @@
 {
   "name": "hubot-basecamp",
   "description": "Provides text previews of Basecamp URLs.",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "author": "Ivan Stegic <ivan.stegic@gmail.com>",
   "license": "MIT",
 
@@ -9,11 +9,11 @@
 
   "repository": {
     "type": "git",
-    "url": "git://github.com/ivanstegic/hubot-basecamp.git"
+    "url": "git@github.com:hubot-scripts/hubot-basecamp.git"
   },
 
   "bugs": {
-    "url": "https://github.com/ivanstegic/hubot-basecamp/issues"
+    "url": "https://github.com/hubot-scripts/hubot-basecamp/issues"
   },
 
   "dependencies": {
