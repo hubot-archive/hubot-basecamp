@@ -85,7 +85,7 @@ parseBasecampResponse = (msgtype, body) ->
     when "todo"
       m = "*#{body.content}*"
       if (body.completed)
-        m = m + " _ (COMPLETED) _"
+        m = m + " (COMPLETED)"
       attcnt = body.attachments.length
       if (attcnt > 0)
         if (attcnt == 1)
@@ -100,7 +100,7 @@ parseBasecampResponse = (msgtype, body) ->
         last = body.comments.pop()
         t = type last
         if (t == 'object')
-          m = m + "\n_ The last comment was made by #{last.creator.name}: _"
+          m = m + "\nThe last comment was made by #{last.creator.name}:"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
           m = m + "\n```#{comment}```"
           lstattcnt = last.attachments.length
@@ -115,7 +115,7 @@ parseBasecampResponse = (msgtype, body) ->
     when "message"
       m = "*#{body.subject}*"
       if (body.creator)
-        m = m + "\n_ #{body.creator.name} first wrote: _"
+        m = m + "\n#{body.creator.name} first wrote:"
       if (body.content)
         bd = totxt.fromString(body.content, { wordwrap: 70 });
         m = m + "\n```#{bd}```"
@@ -132,7 +132,7 @@ parseBasecampResponse = (msgtype, body) ->
         last = body.comments.pop()
         t = type last
         if (t == 'object')
-          m = m + "\n_ The last comment was made by #{last.creator.name}: _"
+          m = m + "\nThe last comment was made by #{last.creator.name}:"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
           m = m + "\n```#{comment}```"
           lstattcnt = last.attachments.length
