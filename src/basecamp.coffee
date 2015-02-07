@@ -102,7 +102,7 @@ parseBasecampResponse = (msgtype, body) ->
         if (t == 'object')
           m = m + "\nThe last comment was made by #{last.creator.name}:"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
-          m = m + "\n```#{comment}```"
+          m = m + "\n```\n#{comment}\n```"
           lstattcnt = last.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
@@ -118,7 +118,7 @@ parseBasecampResponse = (msgtype, body) ->
         m = m + "\n#{body.creator.name} first wrote:"
       if (body.content)
         bd = totxt.fromString(body.content, { wordwrap: 70 });
-        m = m + "\n```#{bd}```"
+        m = m + "\n```\n#{bd}\n```"
       if (body.attachments)
         attcnt = body.attachments.length
         if (attcnt > 0)
@@ -134,7 +134,7 @@ parseBasecampResponse = (msgtype, body) ->
         if (t == 'object')
           m = m + "\nThe last comment was made by #{last.creator.name}:"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
-          m = m + "\n```#{comment}```"
+          m = m + "\n```\n#{comment}\n```"
           lstattcnt = last.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
