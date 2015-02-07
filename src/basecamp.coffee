@@ -63,7 +63,7 @@ module.exports = (robot) ->
     getBasecampRequest msg, "projects/#{heard_project}/todolists/#{heard_list}.json", (err, res, body) ->
       msg.send parseBasecampResponse('todolist', JSON.parse body)
 
-  # Display the original message of a thread, and the last comment if there is one.
+  # Display the original message of a thread, and the latest comment if there is one.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/messages\/(\d+)/, (msg) ->
     heard_project = msg.match[2]
     heard_message = msg.match[3]
@@ -97,22 +97,22 @@ parseBasecampResponse = (msgtype, body) ->
       if (body.assignee)
         m = m + "\n_ Assigned to #{body.assignee.name} _"
       if (body.comments)
-        last = body.comments.pop()
-        t = type last
+        latest = body.comments.pop()
+        t = type latest
         if (t == 'object')
-          comment = totxt.fromString(last.content, { wordwrap: 70 });
+          comment = totxt.fromString(latest.content, { wordwrap: 70 });
           if (comment != 'null')
-            m = m + "\nThe last comment was made by #{last.creator.name}:"
+            m = m + "\nThe latest comment was made by #{latest.creator.name}:"
             m = m + "\n```\n#{comment}\n```"
           else
-            m = m + "\nThe last comment was _empty_ and made by #{last.creator.name}."
-          lstattcnt = last.attachments.length
+            m = m + "\nThe latest comment was _empty_ and made by #{latest.creator.name}."
+          lstattcnt = latest.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
               m = m + "\n_ 1 file: _"
             else
               m = m + "\n_ #{lstattcnt} files: _"
-            for att in last.attachments
+            for att in latest.attachments
               m = m + "\n> #{att.name} (#{att.app_url}|download)"
 
     when "message"
@@ -132,22 +132,22 @@ parseBasecampResponse = (msgtype, body) ->
           for att in body.attachments
             m = m + "\n> #{att.name} (#{att.app_url}|download)"
       if (body.comments)
-        last = body.comments.pop()
-        t = type last
+        latest = body.comments.pop()
+        t = type latest
         if (t == 'object')
-          comment = totxt.fromString(last.content, { wordwrap: 70 });
+          comment = totxt.fromString(latest.content, { wordwrap: 70 });
           if (comment != 'null')
-            m = m + "\nThe last comment was made by #{last.creator.name}:"
+            m = m + "\nThe latest comment was made by #{latest.creator.name}:"
             m = m + "\n```\n#{comment}\n```"
           else
-            m = m + "\nThe last comment was _empty_ and made by #{last.creator.name}."
-          lstattcnt = last.attachments.length
+            m = m + "\nThe latest comment was _empty_ and made by #{latest.creator.name}."
+          lstattcnt = latest.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
               m = m + "\n_ 1 file: _"
             else
               m = m + "\n_ #{lstattcnt} files: _"
-            for att in last.attachments
+            for att in latest.attachments
               m = m + "\n> #{att.name} (#{att.app_url}|download)"
 
   m
