@@ -99,7 +99,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
         due = dateformat(body.due_at, "ddd, mmm d", true)
-        m = m + "\n_ Due on #{due} _"
+        m = m + "\nDue on #{due}"
       attcnt = body.attachments.length
       if (attcnt > 0)
         if (attcnt == 1)
@@ -136,7 +136,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
         due = dateformat(body.due_at, "ddd, mmm d", true)
-        m = m + "\n_ Due on #{due} _"
+        m = m + "\nDue on #{due}"
       attcnt = body.attachments.length
       if (attcnt > 0)
         if (attcnt == 1)
