@@ -100,9 +100,12 @@ parseBasecampResponse = (msgtype, body) ->
         last = body.comments.pop()
         t = type last
         if (t == 'object')
-          m = m + "\nThe last comment was made by #{last.creator.name}:"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
-          m = m + "\n```\n#{comment}\n```"
+          if (comment != 'null')
+            m = m + "\nThe last comment was made by #{last.creator.name}:"
+            m = m + "\n```\n#{comment}\n```"
+          else
+            m = m + "\nThe last comment was _empty_ and made by #{last.creator.name}."
           lstattcnt = last.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
@@ -132,9 +135,12 @@ parseBasecampResponse = (msgtype, body) ->
         last = body.comments.pop()
         t = type last
         if (t == 'object')
-          m = m + "\nThe last comment was made by #{last.creator.name}:"
           comment = totxt.fromString(last.content, { wordwrap: 70 });
-          m = m + "\n```\n#{comment}\n```"
+          if (comment != 'null')
+            m = m + "\nThe last comment was made by #{last.creator.name}:"
+            m = m + "\n```\n#{comment}\n```"
+          else
+            m = m + "\nThe last comment was _empty_ and made by #{last.creator.name}."
           lstattcnt = last.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
