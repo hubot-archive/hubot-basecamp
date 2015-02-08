@@ -12,7 +12,7 @@
 # Notes:
 #   1. Your Basecamp account ID is the number directly after
 #   "https://basecamp.com/" when logged in.
-#	  2. Don't use your own Basecamp username and password. Rather, create one
+#   2. Don't use your own Basecamp username and password. Rather, create one
 #   that has access to all projects, and is added to the templates you use.
 #
 # Author:
@@ -50,11 +50,11 @@ module.exports = (robot) ->
   robot.respond /basecamp|bcx/i, (msg) ->
     msg.send "Sit back and let me do the work. I'll preview todos and messages for you when you paste basecamp.com urls. I currently support expanding single todos with most recent comment, summarizing todolists and expanding messages."
 
-  # Display a single todo item.
+  # Display a single todo item. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
     heard_project = msg.match[2]
     heard_todo = msg.match[3]
-    # Try to figure out if there is a comment being requested.
+    # Figure out if there is a comment being requested.
     original_request = msg.match['input']
     comment_position = original_request.indexOf("comment_")
     if (comment_position > -1)
@@ -73,12 +73,21 @@ module.exports = (robot) ->
     getBasecampRequest msg, "projects/#{heard_project}/todolists/#{heard_list}.json", (err, res, body) ->
       msg.send parseBasecampResponse('todolist', 0, JSON.parse body)
 
-  # Display the original message of a thread, and the latest comment if there is one.
+  # Display the initial message of a discussion. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/messages\/(\d+)/, (msg) ->
     heard_project = msg.match[2]
     heard_message = msg.match[3]
-    getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
-      msg.send parseBasecampResponse('message', 0, JSON.parse body)
+    # Figure out if there is a comment being requested.
+    original_request = msg.match['input']
+    comment_position = original_request.indexOf("comment_")
+    if (comment_position > -1)
+      id_position = comment_position + 8
+      comment_id = original_request.substring(id_position)
+      getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
+        msg.send parseBasecampResponse('messagecomment', comment_id, JSON.parse body)
+    else
+      getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
+        msg.send parseBasecampResponse('message', 0, JSON.parse body)
 
 ############################################################################
 # Helper functions.
@@ -115,11 +124,13 @@ parseBasecampResponse = (msgtype, commentid, body) ->
         t = type latest
         if (t == 'object')
           comment = totxt.fromString(latest.content, { wordwrap: 70 });
+          if (latest.created_at)
+            created = dateformat(latest.created_at, "ddd, mmm d h:MMt")
           if (comment != 'null')
-            m = m + "\nThe latest comment was made by #{latest.creator.name}:"
+            m = m + "\nThe latest comment was made by #{latest.creator.name} on #{created}:"
             m = m + "\n```\n#{comment}\n```"
           else
-            m = m + "\nThe latest comment by #{latest.creator.name} was _ empty _."
+            m = m + "\nThe latest comment was _ empty _ and made by #{latest.creator.name} on #{created}."
           lstattcnt = latest.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
@@ -155,11 +166,13 @@ parseBasecampResponse = (msgtype, commentid, body) ->
         t = type specific_comment
         if (t == 'object')
           comment = totxt.fromString(specific_comment.content, { wordwrap: 70 });
+          if (specific_comment.created_at)
+            created = dateformat(specific_comment.created_at, "ddd, mmm d h:MMt")
           if (comment != 'null')
-            m = m + "\nSpecific comment \##{commentid} was made by #{specific_comment.creator.name}:"
+            m = m + "\nSpecific comment \##{commentid} was made by #{specific_comment.creator.name} on #{created}:"
             m = m + "\n```\n#{comment}\n```"
           else
-            m = m + "\nThat specific comment by #{latest.creator.name} was _ empty _."
+            m = m + "\nThat specific comment was _ empty _ and made by #{specific_comment.creator.name} on #{created}."
           lstattcnt = specific_comment.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
@@ -171,8 +184,9 @@ parseBasecampResponse = (msgtype, commentid, body) ->
 
     when "message"
       m = "*#{body.subject}*"
-      if (body.creator)
-        m = m + "\n#{body.creator.name} first wrote:"
+      if (body.creator && body.created_at)
+          created = dateformat(body.created_at, "ddd, mmm d h:MMt")
+          m = m + "\n#{body.creator.name} first posted on #{created}:"
       if (body.content)
         bd = totxt.fromString(body.content, { wordwrap: 70 });
         m = m + "\n```\n#{bd}\n```"
@@ -190,11 +204,13 @@ parseBasecampResponse = (msgtype, commentid, body) ->
         t = type latest
         if (t == 'object')
           comment = totxt.fromString(latest.content, { wordwrap: 70 });
+          if (latest.created_at)
+            created = dateformat(latest.created_at, "ddd, mmm d h:MMt")
           if (comment != 'null')
-            m = m + "\nThe latest comment was made by #{latest.creator.name}:"
+            m = m + "\nThe latest comment was made by #{latest.creator.name} on #{created}:"
             m = m + "\n```\n#{comment}\n```"
           else
-            m = m + "\nThe latest comment was _empty_ and made by #{latest.creator.name}."
+            m = m + "\nThe latest comment was _empty_ and made by #{latest.creator.name} on #{created} on #{created}."
           lstattcnt = latest.attachments.length
           if (lstattcnt > 0)
             if (lstattcnt == 1)
@@ -204,6 +220,46 @@ parseBasecampResponse = (msgtype, commentid, body) ->
             for att in latest.attachments
               m = m + "\n> #{att.name} (#{att.app_url}|download)"
 
+    when "messagecomment"
+      m = "*#{body.subject}*"
+      if (body.creator && body.created_at)
+          created = dateformat(body.created_at, "ddd, mmm d h:MMt")
+          m = m + "\n#{body.creator.name} first posted on #{created}:"
+      if (body.content)
+        bd = totxt.fromString(body.content, { wordwrap: 70 });
+        m = m + "\n```\n#{bd}\n```"
+      if (body.attachments)
+        attcnt = body.attachments.length
+        if (attcnt > 0)
+          if (attcnt == 1)
+            m = m + "\n_ 1 file: _"
+          else
+            m = m + "\n_ #{attcnt} files: _"
+          for att in body.attachments
+            m = m + "\n> #{att.name} (#{att.app_url}|download)"
+      if (body.comments)
+        # Extract the comment we want.
+        for com in body.comments
+          if ( parseInt(com.id) == parseInt(commentid) )
+            specific_comment = com
+        t = type specific_comment
+        if (t == 'object')
+          comment = totxt.fromString(specific_comment.content, { wordwrap: 70 });
+          if (specific_comment.created_at)
+            created = dateformat(specific_comment.created_at, "ddd, mmm d h:MMt")
+          if (comment != 'null')
+            m = m + "\nSpecific comment \##{commentid} was made by #{specific_comment.creator.name} on #{created}:"
+            m = m + "\n```\n#{comment}\n```"
+          else
+            m = m + "\nThat specific comment was _ empty _ and made by #{specific_comment.creator.name} on #{created}."
+          lstattcnt = specific_comment.attachments.length
+          if (lstattcnt > 0)
+            if (lstattcnt == 1)
+              m = m + "\n_ 1 file: _"
+            else
+              m = m + "\n_ #{lstattcnt} files: _"
+            for att in specific_comment.attachments
+              m = m + "\n> #{att.name} (#{att.app_url}|download)"
   m
 
 
