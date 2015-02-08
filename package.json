@@ -5,7 +5,7 @@
   "author": "Ivan Stegic <ivan.stegic@gmail.com>",
   "license": "MIT",
 
-  "keywords": ["hubot","hubot-scripts","hubot-basecamp","basecamp","37signals","bcx"],
+  "keywords": ["hubot","hubot-scripts","hubot-basecamp","basecamp","37signals","bcx", "basecamp text expander", "basecamp url expander"],
 
   "repository": {
     "type": "git",
