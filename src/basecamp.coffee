@@ -30,17 +30,17 @@ pass = process.env.HUBOT_BCX_PASSWORD
 
 # No ID is set.
 unless id?
-    console.log "Missing HUBOT_BCX_ACCOUNT_ID environment variable, please set it with your Basecamp account ID. This is the number directly following \"https://basecamp.com/\" in the URL when you are logged into your Basecamp account."
+    console.log "Missing HUBOT_BCX_ACCOUNT_ID environment variable, please set it with your Basecamp account ID. This is the number directly following \"https://basecamp.com/\" in the URL when you are logged into your Basecamp account. More help is available at https://github.com/hubot-scripts/hubot-basecamp/#configuration"
     process.exit(1)
 
 # No Basecamp user is set.
 unless user?
-    console.log "Missing HUBOT_BCX_USERNAME environment variable, please set it with your Basecamp username or email address. Protip: create a generic user with access to all Basecamp projects, don't use your personal details."
+    console.log "Missing HUBOT_BCX_USERNAME environment variable, please set it with your Basecamp username or email address. Protip: create a generic user with access to all Basecamp projects, don't use your personal details. More help is available at https://github.com/hubot-scripts/hubot-basecamp/#configuration"
     process.exit(1)
 
 # No Basecamp password is set.
 unless pass?
-    console.log "Missing HUBOT_BCX_PASSWORD environment variable, please set it with your Basecamp password."
+    console.log "Missing HUBOT_BCX_PASSWORD environment variable, please set it with your Basecamp password. More help is available at https://github.com/hubot-scripts/hubot-basecamp/#configuration"
     process.exit(1)
 
 # Export the robot, as hubot expects.
@@ -48,7 +48,7 @@ module.exports = (robot) ->
 
   # Respond to 'basecamp' or 'bcx' with what this guy does.
   robot.respond /basecamp|bcx/i, (msg) ->
-    msg.send "Sit back and let me do the work. I'll preview todos and messages for you when you paste basecamp.com urls. I currently support expanding single todos with most recent comment, summarizing todolists and expanding messages."
+    msg.send "Greetings, human. I'll expand discussions and todos for you when you paste basecamp.com URLs into chat. I currently support expanding discussions, single todos and I can summarize todolists. https://github.com/hubot-scripts/hubot-basecamp/#basecamp-in-hubot|More..."
 
   # Display a single todo item. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
