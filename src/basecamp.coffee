@@ -116,7 +116,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
         else
           m = m + "\n_ #{attcnt} files: _"
         for att in body.attachments
-          m = m + "\n> #{att.name} (#{att.app_url}|download)"
+          m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
       if (body.assignee)
         m = m + "\n_ Assigned to #{body.assignee.name} _"
       if (body.comments)
@@ -138,7 +138,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
             else
               m = m + "\n_ #{lstattcnt} files: _"
             for att in latest.attachments
-              m = m + "\n> #{att.name} (#{att.app_url}|download)"
+              m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
 
     when "todocomment"
       m = "*#{body.content}*"
@@ -155,7 +155,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
         else
           m = m + "\n_ #{attcnt} files: _"
         for att in body.attachments
-          m = m + "\n> #{att.name} (#{att.app_url}|download)"
+          m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
       if (body.assignee)
         m = m + "\n_ Assigned to #{body.assignee.name} _"
       if (body.comments)
@@ -180,7 +180,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
             else
               m = m + "\n_ #{lstattcnt} files: _"
             for att in specific_comment.attachments
-              m = m + "\n> #{att.name} (#{att.app_url}|download)"
+              m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
 
     when "message"
       m = "*#{body.subject}*"
@@ -198,7 +198,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
           else
             m = m + "\n_ #{attcnt} files: _"
           for att in body.attachments
-            m = m + "\n> #{att.name} (#{att.app_url}|download)"
+            m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
       if (body.comments)
         latest = body.comments.pop()
         t = type latest
@@ -218,7 +218,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
             else
               m = m + "\n_ #{lstattcnt} files: _"
             for att in latest.attachments
-              m = m + "\n> #{att.name} (#{att.app_url}|download)"
+              m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
 
     when "messagecomment"
       m = "*#{body.subject}*"
@@ -236,7 +236,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
           else
             m = m + "\n_ #{attcnt} files: _"
           for att in body.attachments
-            m = m + "\n> #{att.name} (#{att.app_url}|download)"
+            m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
       if (body.comments)
         # Extract the comment we want.
         for com in body.comments
@@ -259,7 +259,7 @@ parseBasecampResponse = (msgtype, commentid, body) ->
             else
               m = m + "\n_ #{lstattcnt} files: _"
             for att in specific_comment.attachments
-              m = m + "\n> #{att.name} (#{att.app_url}|download)"
+              m = m + "\n> #{att.name} (<#{att.app_url}|download>)"
   m
 
 
