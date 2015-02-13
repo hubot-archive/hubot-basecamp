@@ -1,5 +1,5 @@
 # Description
-#   Provides text previews of Basecamp URLs.
+#   Expands Basecamp URLs with more useful information.
 #
 # Configuration:
 #   HUBOT_BCX_ACCOUNT_ID
