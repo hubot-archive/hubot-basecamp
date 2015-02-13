@@ -1,6 +1,6 @@
 {
   "name": "hubot-basecamp",
-  "description": "Provides text previews of Basecamp URLs.",
+  "description": "Expands Basecamp URLs with more useful information.",
   "version": "0.2.5",
   "author": "Ivan Stegic <ivan.stegic@gmail.com>",
   "license": "MIT",
@@ -19,7 +19,8 @@
   "dependencies": {
     "coffee-script": "~1.6",
     "html-to-text": "1.2.0",
-    "dateformat": "1.0.11"
+    "dateformat": "1.0.11",
+    "nextflow": "0.3.0"
   },
 
   "devDependencies": {
