@@ -7,7 +7,8 @@
 #   HUBOT_BCX_PASSWORD
 #
 # Commands:
-#   hubot basecamp - provides an explanation of what previews are available.
+#   hubot bcx - provides an explanation of what previews are available.
+#   hubot bcx stats - provides an explanation of what previews are available.
 #
 # Notes:
 #   1. Your Basecamp account ID is the number directly after
@@ -47,8 +48,25 @@ unless pass?
 module.exports = (robot) ->
 
   # Respond to 'basecamp' or 'bcx' with what this guy does.
-  robot.respond /basecamp|bcx/i, (msg) ->
+  robot.respond /(basecamp|bcx)$/i, (msg) ->
     msg.send "Greetings, human. I'll expand discussions and todos for you when you paste basecamp.com URLs into chat. I currently support expanding discussions, single todos and I can summarize todolists. https://github.com/hubot-scripts/hubot-basecamp/#basecamp-in-hubot|More..."
+
+  # Respond to 'basecamp stats' or 'bcx stats' with distribution of URLs expanded.
+  robot.respond /(basecamp|bcx) stats$/i, (msg) ->
+    todos = robot.brain.get('bcx_todos') * 1 or 0
+    todo_comments = robot.brain.get('bcx_todo_comments') * 1 or 0
+    todo_total = todos + todo_comments
+    messages = robot.brain.get('bcx_messages') * 1 or 0
+    message_comments = robot.brain.get('bcx_message_comments') * 1 or 0
+    message_total = messages + message_comments
+    todolists = robot.brain.get('bcx_todolists') * 1 or 0
+    grand_total = todo_total + message_total + todolists
+    m = "Here, I give you amazing Basecamp stats! URLs expanded:"
+    m = m + "\n> Todos: " + todo_total
+    m = m + "\n> Discussions: " + message_total
+    m = m + "\n> Todo lists: " + todolists
+    m = m + "\nTotal expanded: " + grand_total
+    msg.send m
 
   # Display a single todo item. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
@@ -62,8 +80,10 @@ module.exports = (robot) ->
         todolist_json = JSON.parse body
         todolist_name = todolist_json.name
         if (heard_comment_id > 0)
+          robot.brain.set 'bcx_todo_comments', robot.brain.get('bcx_todo_comments') + 1
           msg.send parseBasecampResponse('todocomment', heard_comment_id, todo_json, todolist_name)
         else
+          robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
           msg.send parseBasecampResponse('todo', 0, todo_json, todolist_name)
 
   # Display the todo list name and item counts.
@@ -71,6 +91,7 @@ module.exports = (robot) ->
     heard_project = msg.match[2]
     heard_list = msg.match[3]
     getBasecampRequest msg, "projects/#{heard_project}/todolists/#{heard_list}.json", (err, res, body) ->
+      robot.brain.set 'bcx_todolists', robot.brain.get('bcx_todolists') + 1
       msg.send parseBasecampResponse('todolist', 0, JSON.parse body)
 
   # Display the initial message of a discussion. Include latest or a specific comment.
@@ -80,9 +101,11 @@ module.exports = (robot) ->
     heard_comment_id = getCommentID msg.match['input']
     if (heard_comment_id > 0)
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
+        robot.brain.set 'bcx_message_comments', robot.brain.get('bcx_message_comments') + 1
         msg.send parseBasecampResponse('messagecomment', heard_comment_id, JSON.parse body)
     else
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
+        robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
         msg.send parseBasecampResponse('message', 0, JSON.parse body)
 
 ############################################################################
