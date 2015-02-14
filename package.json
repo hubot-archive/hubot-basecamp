@@ -4,25 +4,30 @@
   "version": "0.4.0",
   "author": "Ivan Stegic <ivan.stegic@gmail.com>",
   "license": "MIT",
-
-  "keywords": ["hubot","hubot-scripts","hubot-basecamp","basecamp","37signals","bcx", "basecamp text expander", "basecamp url expander"],
-
+  "keywords": [
+    "hubot",
+    "hubot-scripts",
+    "hubot-basecamp",
+    "basecamp",
+    "37signals",
+    "bcx",
+    "basecamp text expander",
+    "basecamp url expander"
+  ],
   "repository": {
     "type": "git",
     "url": "git@github.com:hubot-scripts/hubot-basecamp.git"
   },
-
   "bugs": {
     "url": "https://github.com/hubot-scripts/hubot-basecamp/issues"
   },
-
   "dependencies": {
+    "analytics-node": "^1.1.1",
     "coffee-script": "~1.6",
-    "html-to-text": "1.2.0",
     "dateformat": "1.0.11",
+    "html-to-text": "1.2.0",
     "hubot-redis-brain": "0.0.2"
   },
-
   "devDependencies": {
     "mocha": "*",
     "chai": "*",
@@ -33,9 +38,7 @@
     "matchdep": "~0.1.2",
     "grunt-contrib-watch": "~0.5.3"
   },
-
   "main": "index.coffee",
-
   "scripts": {
     "test": "grunt test"
   }
