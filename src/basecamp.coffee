@@ -53,6 +53,7 @@ module.exports = (robot) ->
 
   # Respond to 'basecamp stats' or 'bcx stats' with distribution of URLs expanded.
   robot.respond /(basecamp|bcx) stats$/i, (msg) ->
+    # Get stored numbers in the robot brain.
     todos = robot.brain.get('bcx_todos') * 1 or 0
     todo_comments = robot.brain.get('bcx_todo_comments') * 1 or 0
     todo_total = todos + todo_comments
@@ -60,6 +61,7 @@ module.exports = (robot) ->
     message_comments = robot.brain.get('bcx_message_comments') * 1 or 0
     message_total = messages + message_comments
     todolists = robot.brain.get('bcx_todolists') * 1 or 0
+    # Figure out grand total.
     grand_total = todo_total + message_total + todolists
     m = "Here, I give you amazing Basecamp stats! URLs expanded:"
     m = m + "\n> Todos: " + todo_total
@@ -70,15 +72,20 @@ module.exports = (robot) ->
 
   # Display a single todo item. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
+    # Parse out the URL parts.
     heard_project = msg.match[2]
     heard_todo = msg.match[3]
     heard_comment_id = getCommentID msg.match['input']
+    # Get the todo item detail from the API.
     getBasecampRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
       todo_json = JSON.parse body
       todolist_id = todo_json.todolist_id
+      # Get the todo list detail from the API.
       getBasecampRequest msg, "projects/#{heard_project}/todolists/#{todolist_id}.json", (err, res, body) ->
         todolist_json = JSON.parse body
+        # Todo list name is really what we wanted here, the reason for the extra API call.
         todolist_name = todolist_json.name
+        # If we're asking for a comment fragment, show that specific one.
         if (heard_comment_id > 0)
           robot.brain.set 'bcx_todo_comments', robot.brain.get('bcx_todo_comments') + 1
           msg.send parseBasecampResponse('todocomment', heard_comment_id, todo_json, todolist_name)
@@ -88,22 +95,28 @@ module.exports = (robot) ->
 
   # Display the todo list name and item counts.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todolists\/(\d+)/, (msg) ->
+    # Parse out the URL parts.
     heard_project = msg.match[2]
     heard_list = msg.match[3]
+    # Get the todo list detail from the API.
     getBasecampRequest msg, "projects/#{heard_project}/todolists/#{heard_list}.json", (err, res, body) ->
       robot.brain.set 'bcx_todolists', robot.brain.get('bcx_todolists') + 1
       msg.send parseBasecampResponse('todolist', 0, JSON.parse body)
 
   # Display the initial message of a discussion. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/messages\/(\d+)/, (msg) ->
+    # Parse out the URL parts.
     heard_project = msg.match[2]
     heard_message = msg.match[3]
     heard_comment_id = getCommentID msg.match['input']
     if (heard_comment_id > 0)
+      # Get the discussion detail from the API.
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
         robot.brain.set 'bcx_message_comments', robot.brain.get('bcx_message_comments') + 1
+        # If we're asking for a comment fragment, show that specific one.
         msg.send parseBasecampResponse('messagecomment', heard_comment_id, JSON.parse body)
     else
+      # Get the discussion detail from the API.
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
         robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
         msg.send parseBasecampResponse('message', 0, JSON.parse body)
@@ -117,6 +130,7 @@ getCommentID = (url) ->
   comment_id = 0
   comment_position = url.indexOf("comment_")
   if (comment_position > -1)
+    # Really only care about the integer after the underscore.
     comment_id = url.substring(comment_position + 8)
   return comment_id
 
