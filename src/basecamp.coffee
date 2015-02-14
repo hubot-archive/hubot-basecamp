@@ -232,21 +232,6 @@ parseBasecampResponse = (msgtype, commentid, body, todolist_name) ->
 
     when "messagecomment"
       m = "*#{body.subject}*"
-      if (body.creator && body.created_at)
-          created = dateformat(body.created_at, "ddd, mmm d h:MMt")
-          m = m + "\n#{body.creator.name} first posted on #{created}:"
-      if (body.content)
-        bd = totxt.fromString(body.content, { wordwrap: 70 });
-        m = m + "\n```\n#{bd}\n```"
-      if (body.attachments)
-        attcnt = body.attachments.length
-        if (attcnt > 0)
-          if (attcnt == 1)
-            m = m + "\n_ 1 file: _"
-          else
-            m = m + "\n_ #{attcnt} files: _"
-          for att in body.attachments
-            m = m + "\n> #{att.app_url}|#{att.name} "
       if (body.comments)
         # Extract the comment we want.
         for com in body.comments
