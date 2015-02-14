@@ -112,7 +112,7 @@ parseBasecampResponse = (msgtype, commentid, body, todolist_name) ->
       if (body.completed)
         m = m + " (COMPLETED)"
       if (todolist_name)
-        m = m + "\n_ from #{todolist_name} _"
+        m = m + "\nfrom #{todolist_name}"
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
         due = dateformat(body.due_at, "ddd, mmm d", true)
@@ -153,7 +153,7 @@ parseBasecampResponse = (msgtype, commentid, body, todolist_name) ->
       if (body.completed)
         m = m + " (COMPLETED)"
       if (todolist_name)
-        m = m + "\n_ from #{todolist_name} _"
+        m = m + "\nfrom #{todolist_name}"
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
         due = dateformat(body.due_at, "ddd, mmm d", true)
