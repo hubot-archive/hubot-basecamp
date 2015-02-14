@@ -8,7 +8,7 @@
 #
 # Commands:
 #   hubot bcx - provides an explanation of what previews are available.
-#   hubot bcx stats - provides an explanation of what previews are available.
+#   hubot bcx stats - provides statistics on how many URLs have been expanded.
 #
 # Notes:
 #   1. Your Basecamp account ID is the number directly after
