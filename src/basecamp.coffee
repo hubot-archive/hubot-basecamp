@@ -49,7 +49,7 @@ module.exports = (robot) ->
 
   # Respond to 'basecamp' or 'bcx' with what this guy does.
   robot.respond /(basecamp|bcx)$/i, (msg) ->
-    msg.send "Greetings, human. I'll expand discussions and todos for you when you paste basecamp.com URLs into chat. I currently support expanding discussions, single todos and I can summarize todolists. https://github.com/hubot-scripts/hubot-basecamp/#basecamp-in-hubot|More..."
+    msg.send "Greetings, human. I'll expand discussions and todos for you when you paste basecamp.com URLs into chat. I currently support expanding discussions, single todos and I can summarize todolists. http://git.io/NKlC|More..."
 
   # Respond to 'basecamp stats' or 'bcx stats' with distribution of URLs expanded.
   robot.respond /(basecamp|bcx) stats$/i, (msg) ->
