@@ -22,6 +22,7 @@
 # Dependencies.
 totxt = require "html-to-text"
 dateformat = require "dateformat"
+next = require "nextflow"
 
 # Variables.
 id = process.env.HUBOT_BCX_ACCOUNT_ID
@@ -54,14 +55,10 @@ module.exports = (robot) ->
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
     heard_project = msg.match[2]
     heard_todo = msg.match[3]
-    # Figure out if there is a comment being requested.
-    original_request = msg.match['input']
-    comment_position = original_request.indexOf("comment_")
-    if (comment_position > -1)
-      id_position = comment_position + 8
-      comment_id = original_request.substring(id_position)
+    heard_comment_id = getCommentID msg.match['input']
+    if (heard_comment_id > 0)
       getBasecampRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
-        msg.send parseBasecampResponse('todocomment', comment_id, JSON.parse body)
+        msg.send parseBasecampResponse('todocomment', heard_comment_id, JSON.parse body)
     else
       getBasecampRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
         msg.send parseBasecampResponse('todo', 0, JSON.parse body)
@@ -77,20 +74,26 @@ module.exports = (robot) ->
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/messages\/(\d+)/, (msg) ->
     heard_project = msg.match[2]
     heard_message = msg.match[3]
-    # Figure out if there is a comment being requested.
-    original_request = msg.match['input']
-    comment_position = original_request.indexOf("comment_")
-    if (comment_position > -1)
-      id_position = comment_position + 8
-      comment_id = original_request.substring(id_position)
+    heard_comment_id = getCommentID msg.match['input']
+    if (heard_comment_id > 0)
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
-        msg.send parseBasecampResponse('messagecomment', comment_id, JSON.parse body)
+        msg.send parseBasecampResponse('messagecomment', heard_comment_id, JSON.parse body)
     else
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
         msg.send parseBasecampResponse('message', 0, JSON.parse body)
 
 ############################################################################
 # Helper functions.
+
+
+# Extract the comment ID from a Basecamp URL.
+getCommentID = (url) ->
+  comment_id = 0
+  comment_position = url.indexOf("comment_")
+  if (comment_position > -1)
+    comment_id = url.substring(comment_position + 8)
+  return comment_id
+
 
 # Parse a response and format nicely.
 parseBasecampResponse = (msgtype, commentid, body) ->
