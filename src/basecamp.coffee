@@ -22,7 +22,6 @@
 # Dependencies.
 totxt = require "html-to-text"
 dateformat = require "dateformat"
-next = require "nextflow"
 
 # Variables.
 id = process.env.HUBOT_BCX_ACCOUNT_ID
@@ -56,12 +55,16 @@ module.exports = (robot) ->
     heard_project = msg.match[2]
     heard_todo = msg.match[3]
     heard_comment_id = getCommentID msg.match['input']
-    if (heard_comment_id > 0)
-      getBasecampRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
-        msg.send parseBasecampResponse('todocomment', heard_comment_id, JSON.parse body)
-    else
-      getBasecampRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
-        msg.send parseBasecampResponse('todo', 0, JSON.parse body)
+    getBasecampRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
+      todo_json = JSON.parse body
+      todolist_id = todo_json.todolist_id
+      getBasecampRequest msg, "projects/#{heard_project}/todolists/#{todolist_id}.json", (err, res, body) ->
+        todolist_json = JSON.parse body
+        todolist_name = todolist_json.name
+        if (heard_comment_id > 0)
+          msg.send parseBasecampResponse('todocomment', heard_comment_id, todo_json, todolist_name)
+        else
+          msg.send parseBasecampResponse('todo', 0, todo_json, todolist_name)
 
   # Display the todo list name and item counts.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todolists\/(\d+)/, (msg) ->
@@ -96,7 +99,7 @@ getCommentID = (url) ->
 
 
 # Parse a response and format nicely.
-parseBasecampResponse = (msgtype, commentid, body) ->
+parseBasecampResponse = (msgtype, commentid, body, todolist_name) ->
 
   switch msgtype
 
@@ -108,6 +111,8 @@ parseBasecampResponse = (msgtype, commentid, body) ->
       m = "*#{body.content}*"
       if (body.completed)
         m = m + " (COMPLETED)"
+      if (todolist_name)
+        m = m + "\n_ from #{todolist_name} _"
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
         due = dateformat(body.due_at, "ddd, mmm d", true)
@@ -147,6 +152,8 @@ parseBasecampResponse = (msgtype, commentid, body) ->
       m = "*#{body.content}*"
       if (body.completed)
         m = m + " (COMPLETED)"
+      if (todolist_name)
+        m = m + "\n_ from #{todolist_name} _"
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
         due = dateformat(body.due_at, "ddd, mmm d", true)
