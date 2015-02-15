@@ -145,6 +145,7 @@ module.exports = (robot) ->
 identify = (robot) ->
   uid = robot.brain.get('uid') or (id + "_" + Date.now())
   ver = robot.brain.get('version') or 0
+  console.log "I am #{uid}, version #{ver}. Program version #{VERSION}"
   if (ver != VERSION)
     robot.brain.set 'uid', uid
     robot.brain.set 'version', VERSION
@@ -155,7 +156,6 @@ identify = (robot) ->
         version: VERSION
       }
     });
-
 
 # Track an event.
 track = (robot, event_type, kind) ->
