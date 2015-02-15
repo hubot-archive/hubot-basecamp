@@ -23,36 +23,46 @@
 # Dependencies.
 totxt = require "html-to-text"
 dateformat = require "dateformat"
+Analytics = require("analytics-node")
+analytics = new Analytics("WtHFFGgB8F5z9obzELnRBy2RpBEI9Skj")
 
 # Variables.
 id = process.env.HUBOT_BCX_ACCOUNT_ID
 user = process.env.HUBOT_BCX_USERNAME
 pass = process.env.HUBOT_BCX_PASSWORD
 
+# Constants.
+VERSION = "v0.5.0"
+
 # No ID is set.
 unless id?
-    console.log "Missing HUBOT_BCX_ACCOUNT_ID environment variable, please set it with your Basecamp account ID. This is the number directly following \"https://basecamp.com/\" in the URL when you are logged into your Basecamp account. More help is available at https://github.com/hubot-scripts/hubot-basecamp/#configuration"
+    console.log "Missing HUBOT_BCX_ACCOUNT_ID environment variable, please set it with your Basecamp account ID. This is the number directly following \"https://basecamp.com/\" in the URL when you are logged into your Basecamp account. More help is available at https://github.com/hubot-scripts/hubot-basecamp"
     process.exit(1)
 
 # No Basecamp user is set.
 unless user?
-    console.log "Missing HUBOT_BCX_USERNAME environment variable, please set it with your Basecamp username or email address. Protip: create a generic user with access to all Basecamp projects, don't use your personal details. More help is available at https://github.com/hubot-scripts/hubot-basecamp/#configuration"
+    console.log "Missing HUBOT_BCX_USERNAME environment variable, please set it with your Basecamp username or email address. Protip: create a generic user with access to all Basecamp projects, don't use your personal details. More help is available at https://github.com/hubot-scripts/hubot-basecamp"
     process.exit(1)
 
 # No Basecamp password is set.
 unless pass?
-    console.log "Missing HUBOT_BCX_PASSWORD environment variable, please set it with your Basecamp password. More help is available at https://github.com/hubot-scripts/hubot-basecamp/#configuration"
+    console.log "Missing HUBOT_BCX_PASSWORD environment variable, please set it with your Basecamp password. More help is available at https://github.com/hubot-scripts/hubot-basecamp"
     process.exit(1)
 
 # Export the robot, as hubot expects.
 module.exports = (robot) ->
 
+  # Initialize.
+  identify robot
+
   # Respond to 'basecamp' or 'bcx' with what this guy does.
   robot.respond /(basecamp|bcx)$/i, (msg) ->
-    msg.send "Greetings, human. I'll expand discussions and todos for you when you paste basecamp.com URLs into chat. I currently support expanding discussions, single todos and I can summarize todolists. http://git.io/NKlC|More..."
+    track robot, "respond", "help"
+    msg.send "Greetings, human. I'll expand discussions and todos for you when you paste basecamp.com URLs into chat. I currently support expanding discussions, single todos and I can summarize todolists. https://github.com/hubot-scripts/hubot-basecamp|More..."
 
   # Respond to 'basecamp stats' or 'bcx stats' with distribution of URLs expanded.
   robot.respond /(basecamp|bcx) stats$/i, (msg) ->
+
     # Get stored numbers in the robot brain.
     todos = robot.brain.get('bcx_todos') * 1 or 0
     todo_comments = robot.brain.get('bcx_todo_comments') * 1 or 0
@@ -68,6 +78,7 @@ module.exports = (robot) ->
     m = m + "\n> Discussions: " + message_total
     m = m + "\n> Todo lists: " + todolists
     m = m + "\nTotal expanded: " + grand_total
+    track robot, "respond", "stats"
     msg.send m
 
   # Display a single todo item. Include latest or a specific comment.
@@ -88,9 +99,11 @@ module.exports = (robot) ->
         # If we're asking for a comment fragment, show that specific one.
         if (heard_comment_id > 0)
           robot.brain.set 'bcx_todo_comments', robot.brain.get('bcx_todo_comments') + 1
+          track robot, "expand", "todo-comment"
           msg.send parseBasecampResponse('todocomment', heard_comment_id, todo_json, todolist_name)
         else
           robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
+          track robot, "expand", "todo"
           msg.send parseBasecampResponse('todo', 0, todo_json, todolist_name)
 
   # Display the todo list name and item counts.
@@ -100,6 +113,7 @@ module.exports = (robot) ->
     heard_list = msg.match[3]
     # Get the todo list detail from the API.
     getBasecampRequest msg, "projects/#{heard_project}/todolists/#{heard_list}.json", (err, res, body) ->
+      track robot, "expand", "todolist"
       robot.brain.set 'bcx_todolists', robot.brain.get('bcx_todolists') + 1
       msg.send parseBasecampResponse('todolist', 0, JSON.parse body)
 
@@ -112,17 +126,46 @@ module.exports = (robot) ->
     if (heard_comment_id > 0)
       # Get the discussion detail from the API.
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
+        track robot, "expand", "message-comment"
         robot.brain.set 'bcx_message_comments', robot.brain.get('bcx_message_comments') + 1
         # If we're asking for a comment fragment, show that specific one.
         msg.send parseBasecampResponse('messagecomment', heard_comment_id, JSON.parse body)
     else
       # Get the discussion detail from the API.
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
+        track robot, "expand", "message"
         robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
         msg.send parseBasecampResponse('message', 0, JSON.parse body)
 
 ############################################################################
-# Helper functions.
+# Functions.
+
+
+# Identify a user.
+identify = (robot) ->
+  uid = robot.brain.get('uid') or (id + "_" + Date.now())
+  ver = robot.brain.get('version') or 0
+  if (ver != VERSION)
+    robot.brain.set 'uid', uid
+    robot.brain.set 'version', VERSION
+    analytics.identify({
+      userId: uid,
+      traits: {
+        adapter: robot.adapterName,
+        version: VERSION
+      }
+    });
+
+
+# Track an event.
+track = (robot, event_type, kind) ->
+  analytics.track({
+    userId: robot.brain.get('uid'),
+    event: event_type,
+    properties: {
+      kind: kind
+    }
+  });
 
 
 # Extract the comment ID from a Basecamp URL.
@@ -302,6 +345,7 @@ getBasecampRequest = (msg, path, callback) ->
     .auth(user, pass)
     .get() (err, res, body) ->
       callback(err, res, body)
+
 
 # Modified typeof function that is actually reliable.
 type = (obj) ->
