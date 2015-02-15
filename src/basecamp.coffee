@@ -32,7 +32,7 @@ user = process.env.HUBOT_BCX_USERNAME
 pass = process.env.HUBOT_BCX_PASSWORD
 
 # Constants.
-VERSION = "v0.5.2"
+VERSION = "v0.5.3"
 
 # No ID is set.
 unless id?
@@ -51,10 +51,6 @@ unless pass?
 
 # Export the robot, as hubot expects.
 module.exports = (robot) ->
-
-  # Initialize.
-  robot.brain.on 'loaded', ->
-    identify robot
 
   # Respond to 'basecamp' or 'bcx' with what this guy does.
   robot.respond /(basecamp|bcx)$/i, (msg) ->
@@ -141,12 +137,10 @@ module.exports = (robot) ->
 ############################################################################
 # Functions.
 
-
-# Identify a user.
-identify = (robot) ->
+# Track an event.
+track = (robot, event_type, kind) ->
   uid = robot.brain.get('uid') or (id + "_" + Date.now())
   ver = robot.brain.get('version') or 0
-  console.log "I am #{uid}, version #{ver}. Program version #{VERSION}"
   if (ver != VERSION)
     robot.brain.set 'uid', uid
     robot.brain.set 'version', VERSION
@@ -157,11 +151,9 @@ identify = (robot) ->
         version: VERSION
       }
     });
-
-# Track an event.
-track = (robot, event_type, kind) ->
+    console.log "I am #{uid}, version #{ver}. Program version #{VERSION}"
   analytics.track({
-    userId: robot.brain.get('uid'),
+    userId: uid,
     event: event_type,
     properties: {
       kind: kind
