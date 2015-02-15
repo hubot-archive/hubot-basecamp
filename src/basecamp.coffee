@@ -32,7 +32,7 @@ user = process.env.HUBOT_BCX_USERNAME
 pass = process.env.HUBOT_BCX_PASSWORD
 
 # Constants.
-VERSION = "v0.5.0"
+VERSION = "v0.5.2"
 
 # No ID is set.
 unless id?
@@ -53,7 +53,8 @@ unless pass?
 module.exports = (robot) ->
 
   # Initialize.
-  identify robot
+  robot.brain.on 'loaded', ->
+    identify robot
 
   # Respond to 'basecamp' or 'bcx' with what this guy does.
   robot.respond /(basecamp|bcx)$/i, (msg) ->
