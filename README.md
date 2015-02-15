@@ -1,15 +1,32 @@
-# Basecamp in Hubot
+# Basecamp URL Expander for Hubot
 
-Provides text previews of Basecamp urls. Something like this:
+A simple bot that listens for [basecamp.com](http://basecamp.com/) discussions and todos expanding them with more useful information via the [Basecamp API](https://github.com/basecamp/bcx-api/).
+
+Recognizes
+* discussions
+* individual todos
+* todo lists
+
+Renders
+* discussion title, first post and latest comment
+* todo title, due date, assignee, first post, latest comment
+* specific comments on discussions and todos if `#comment_12345678` URL fragments are detected
+* direct links to associated files
+* todo list summary
+
+## Examples
+### Individual todo
+In [Slack](http://slack.com/) individual todo URLs of the form `https://basecamp.com/1234567/projects/1234567/todos/123456789` with an assignee, due date and attachments look something like this
+![hubot-basecamp-demo-1](https://www.evernote.com/shard/s248/sh/ea533ec6-80d3-45f6-9c6e-ecf75b587a99/e2e54957ab4be5830255b7507876dd38/deep/0/test---TEN7-Slack.png)
+
+### Discussion with specific comment
+You can also just extract a particular comment from a discussion (or a todo) by including the fragment in the URL. So, something like `https://basecamp.com/1234567/projects/1234567/messages/12345678#comment_123456789` looks something like this
+![hubot-basecamp-demo-2](https://www.evernote.com/shard/s248/sh/a01ee471-c158-4d2d-9804-6181634c3df3/46ff5569183ec0708133de930b9b4039/deep/0/test---TEN7-Slack.png)
 
 
-![hubot-basecamp-demo](https://raw.githubusercontent.com/hubot-scripts/hubot-basecamp/master/images/hubot-basecamp-preview.png)
-
-This script monitors chat for basecamp.com urls and:
-* shows todos and includes the latest comment for urls of the form https://basecamp.com/1234567/projects/1234567/todos/123456789
-* shows todo list names and lists outstanding and completed count for urls of the form https://basecamp.com/1234567/projects/1234567/todolists/12345678
-* shows a discussion's subject, first message and latest comment for urls of the form https://basecamp.com/1234567/projects/1234567/messages/123456789
-
+### Todo list
+Summary information for a todolist is also provided:
+![hubot-basecamp-demo-3](https://www.evernote.com/shard/s248/sh/f07bf604-e5e5-42e3-9cf9-ce0eab605014/702a138455f6377de34ad27fb5e84bad/deep/0/test---TEN7-Slack.png)
 
 ## Installation
 
@@ -40,6 +57,6 @@ You can use your own username (or email address) and password in the configurati
 * add this user to any templates you have so hubot gets added to new template based projects
 
 ## Issues and Feature Requests
-If you're having an issue, please [describe it](https://github.com/hubot-scripts/hubot-basecamp/issues/new) to me, and I'll do my best to address is.
+If you're having an issue, please [describe it](https://github.com/hubot-scripts/hubot-basecamp/issues/) to me, and I'll do my best to address is.
 
-If you've got a good idea for something hubot should do, [create the issue](https://github.com/hubot-scripts/hubot-basecamp/issues/new) and tag it as an enhancement.
+If you've got a good idea for something hubot should do, [create the issue](https://github.com/hubot-scripts/hubot-basecamp/issues/) and tag it as an `enhancement`.
