@@ -176,6 +176,7 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
       m = m + "\n#{body.completed_count} completed, #{body.remaining_count} remaining"
 
     when "todo"
+      # Setup an array for the meta info.
       meta = []
       # The todo itself
       m = "*#{body.content}*"
@@ -251,9 +252,9 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
         attcnt = body.attachments.length
         if (attcnt > 0)
           if (attcnt == 1)
-            m = m + "\n_ 1 file: _"
+            m = m + "\n1 file:"
           else
-            m = m + "\n_ #{attcnt} files: _"
+            m = m + "\n#{attcnt} files:"
           for att in body.attachments
             m = m + "\n> #{att.app_url}|#{att.name} "
       # Comment.
@@ -280,9 +281,9 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
           comattcnt = comment_to_show.attachments.length
           if (comattcnt > 0)
             if (comattcnt == 1)
-              m = m + "\n_ 1 file: _"
+              m = m + "\n1 file:"
             else
-              m = m + "\n_ #{comattcnt} files: _"
+              m = m + "\n#{comattcnt} files:"
             for att in comment_to_show.attachments
               m = m + "\n> #{att.app_url}|#{att.name} "
 
