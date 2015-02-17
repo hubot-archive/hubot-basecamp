@@ -176,6 +176,7 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
       m = m + "\n#{body.completed_count} completed, #{body.remaining_count} remaining"
 
     when "todo"
+      meta = []
       # The todo itself
       m = "*#{body.content}*"
       # Whether the todo was to-done.
@@ -183,24 +184,26 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
         m = m + " (COMPLETED)"
       # Which todo list this item belongs to.
       if (todolist_name)
-        m = m + "\nfrom #{todolist_name}"
+        meta.push "from the '#{todolist_name}' to-do list"
       # When the todo is due, if there's a date.
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
-        due = dateformat(body.due_at, "ddd, mmm d", true)
-        m = m + "\nDue on #{due}"
+        meta.push "due on " + dateformat(body.due_at, "ddd, mmm d", true)
+      # Who this todo was assigned to, if anyone.
+      if (body.assignee)
+        meta.push "assigned to #{body.assignee.name}"
+      # If there is meta info, show it.
+      if (meta)
+        m = m + "\n_ " + meta.join(" • ") + " _"
       # The attachment(s) uploaded with the original item.
       attcnt = body.attachments.length
       if (attcnt > 0)
         if (attcnt == 1)
-          m = m + "\n_ 1 file: _"
+          m = m + "\n1 file:"
         else
-          m = m + "\n_ #{attcnt} files: _"
+          m = m + "\n#{attcnt} files:"
         for att in body.attachments
           m = m + "\n> #{att.app_url}|#{att.name} "
-      # Who this todo was assigned to, if anyone.
-      if (body.assignee)
-        m = m + "\n_ Assigned to #{body.assignee.name} _"
       # Comments, if any.
       if (body.comments)
         # The latest comment, or a specific one if requested.
@@ -226,9 +229,9 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
           comattcnt = comment_to_show.attachments.length
           if (comattcnt > 0)
             if (comattcnt == 1)
-              m = m + "\n_ 1 file: _"
+              m = m + "\n1 file:"
             else
-              m = m + "\n_ #{comattcnt} files: _"
+              m = m + "\n#{comattcnt} files:"
             for att in comment_to_show.attachments
               m = m + "\n> #{att.app_url}|#{att.name} "
 
