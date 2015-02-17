@@ -61,17 +61,13 @@ module.exports = (robot) ->
   robot.respond /(basecamp|bcx) stats$/i, (msg) ->
     # Get stored numbers in the robot brain.
     todos = robot.brain.get('bcx_todos') * 1 or 0
-    todo_comments = robot.brain.get('bcx_todo_comments') * 1 or 0
-    todo_total = todos + todo_comments
     messages = robot.brain.get('bcx_messages') * 1 or 0
-    message_comments = robot.brain.get('bcx_message_comments') * 1 or 0
-    message_total = messages + message_comments
     todolists = robot.brain.get('bcx_todolists') * 1 or 0
     # Figure out grand total.
-    grand_total = todo_total + message_total + todolists
+    grand_total = todos + messages + todolists
     m = "Here, I give you amazing Basecamp stats! URLs expanded:"
-    m = m + "\n> Todos: " + todo_total
-    m = m + "\n> Discussions: " + message_total
+    m = m + "\n> Todos: " + todos
+    m = m + "\n> Discussions: " + messages
     m = m + "\n> Todo lists: " + todolists
     m = m + "\nTotal expanded: " + grand_total
     track robot, "respond", "stats"
@@ -97,15 +93,9 @@ module.exports = (robot) ->
             if (t == 'object')
               # Todo list name is really what we wanted here, the reason for the extra API call.
               todolist_name = todolist_json.name
-              # If we're asking for a comment fragment, show that specific one.
-              if (heard_comment_id > 0)
-                robot.brain.set 'bcx_todo_comments', robot.brain.get('bcx_todo_comments') + 1
-                track robot, "expand", "todo-comment"
-                msg.send parseBasecampResponse('todocomment', heard_comment_id, todo_json, todolist_name)
-              else
-                robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
-                track robot, "expand", "todo"
-                msg.send parseBasecampResponse('todo', 0, todo_json, todolist_name)
+              track robot, "expand", "todo"
+              robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
+              msg.send parseBasecampResponse('todo', heard_comment_id, todo_json, todolist_name)
 
   # Display the todo list name and item counts.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todolists\/(\d+)/, (msg) ->
@@ -129,25 +119,14 @@ module.exports = (robot) ->
       heard_project = msg.match[2]
       heard_message = msg.match[3]
       heard_comment_id = getCommentID msg.match['input']
-      if (heard_comment_id > 0)
-        # Get the discussion detail from the API.
-        getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
-          message_json = JSON.parse body || null
-          t = type message_json
-          if (t == 'object')
-            track robot, "expand", "message-comment"
-            robot.brain.set 'bcx_message_comments', robot.brain.get('bcx_message_comments') + 1
-            # If we're asking for a comment fragment, show that specific one.
-            msg.send parseBasecampResponse('messagecomment', heard_comment_id, message_json)
-      else
-        # Get the discussion detail from the API.
-        getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
-          message_json = JSON.parse body || null
-          t = type message_json
-          if (t == 'object')
-            track robot, "expand", "message"
-            robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
-            msg.send parseBasecampResponse('message', 0, message_json)
+      # Get the discussion detail from the API.
+      getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
+        message_json = JSON.parse body || null
+        t = type message_json
+        if (t == 'object')
+          track robot, "expand", "message"
+          robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
+          msg.send parseBasecampResponse('message', heard_comment_id, message_json)
 
 ############################################################################
 # Functions.
@@ -189,7 +168,23 @@ getCommentID = (url) ->
 # Parse a response and format nicely.
 parseBasecampResponse = (msgtype, commentid, body, todolist_name) ->
 
+  # Figure out which route to take for rendering purposes.
   switch msgtype
+    when "todolist"
+      rendertype = "todolist"
+    when "todo"
+      if (commentid > 0)
+        rendertype = "todocomment"
+      else
+        rendertype = "todo"
+    when "message"
+      if (commentid > 0)
+        rendertype = "messagecomment"
+      else
+        rendertype = "message"
+
+  # What we're rendering.
+  switch rendertype
 
     when "todolist"
       m = "*#{body.name}* todo list"
