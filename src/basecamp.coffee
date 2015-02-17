@@ -68,7 +68,7 @@ module.exports = (robot) ->
     m = "Here, I give you amazing Basecamp stats! URLs expanded:"
     m = m + "\n> Todos: " + todos
     m = m + "\n> Discussions: " + messages
-    m = m + "\n> Todo lists: " + todolists
+    m = m + "\n> To-do lists: " + todolists
     m = m + "\nTotal expanded: " + grand_total
     track robot, "respond", "stats"
     msg.send m
@@ -172,7 +172,7 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
   switch msgtype
 
     when "todolist"
-      m = "*#{body.name}* todo list"
+      m = "*#{body.name}* to-do list"
       m = m + "\n#{body.completed_count} completed, #{body.remaining_count} remaining"
 
     when "todo"
