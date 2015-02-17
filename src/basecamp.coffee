@@ -86,22 +86,26 @@ module.exports = (robot) ->
     heard_comment_id = getCommentID msg.match['input']
     # Get the todo item detail from the API.
     getBasecampRequest msg, "projects/#{heard_project}/todos/#{heard_todo}.json", (err, res, body) ->
-      todo_json = JSON.parse body
-      todolist_id = todo_json.todolist_id
-      # Get the todo list detail from the API.
-      getBasecampRequest msg, "projects/#{heard_project}/todolists/#{todolist_id}.json", (err, res, body) ->
-        todolist_json = JSON.parse body
-        # Todo list name is really what we wanted here, the reason for the extra API call.
-        todolist_name = todolist_json.name
-        # If we're asking for a comment fragment, show that specific one.
-        if (heard_comment_id > 0)
-          robot.brain.set 'bcx_todo_comments', robot.brain.get('bcx_todo_comments') + 1
-          track robot, "expand", "todo-comment"
-          msg.send parseBasecampResponse('todocomment', heard_comment_id, todo_json, todolist_name)
-        else
-          robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
-          track robot, "expand", "todo"
-          msg.send parseBasecampResponse('todo', 0, todo_json, todolist_name)
+      todo_json = JSON.parse body || null
+      t = type todo_json
+      if (t == 'object')
+        todolist_id = todo_json.todolist_id
+        # Get the todo list detail from the API.
+        getBasecampRequest msg, "projects/#{heard_project}/todolists/#{todolist_id}.json", (err, res, body) ->
+          todolist_json = JSON.parse body || null
+          t = type todolist_json
+          if (t == 'object')
+            # Todo list name is really what we wanted here, the reason for the extra API call.
+            todolist_name = todolist_json.name
+            # If we're asking for a comment fragment, show that specific one.
+            if (heard_comment_id > 0)
+              robot.brain.set 'bcx_todo_comments', robot.brain.get('bcx_todo_comments') + 1
+              track robot, "expand", "todo-comment"
+              msg.send parseBasecampResponse('todocomment', heard_comment_id, todo_json, todolist_name)
+            else
+              robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
+              track robot, "expand", "todo"
+              msg.send parseBasecampResponse('todo', 0, todo_json, todolist_name)
 
   # Display the todo list name and item counts.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todolists\/(\d+)/, (msg) ->
@@ -110,9 +114,12 @@ module.exports = (robot) ->
     heard_list = msg.match[3]
     # Get the todo list detail from the API.
     getBasecampRequest msg, "projects/#{heard_project}/todolists/#{heard_list}.json", (err, res, body) ->
-      track robot, "expand", "todolist"
-      robot.brain.set 'bcx_todolists', robot.brain.get('bcx_todolists') + 1
-      msg.send parseBasecampResponse('todolist', 0, JSON.parse body)
+      todolist_json = JSON.parse body || null
+      t = type todolist_json
+      if (t == 'object')
+        track robot, "expand", "todolist"
+        robot.brain.set 'bcx_todolists', robot.brain.get('bcx_todolists') + 1
+        msg.send parseBasecampResponse('todolist', 0, todolist_json)
 
   # Display the initial message of a discussion. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/messages\/(\d+)/, (msg) ->
@@ -123,16 +130,22 @@ module.exports = (robot) ->
     if (heard_comment_id > 0)
       # Get the discussion detail from the API.
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
-        track robot, "expand", "message-comment"
-        robot.brain.set 'bcx_message_comments', robot.brain.get('bcx_message_comments') + 1
-        # If we're asking for a comment fragment, show that specific one.
-        msg.send parseBasecampResponse('messagecomment', heard_comment_id, JSON.parse body)
+        message_json = JSON.parse body || null
+        t = type message_json
+        if (t == 'object')
+          track robot, "expand", "message-comment"
+          robot.brain.set 'bcx_message_comments', robot.brain.get('bcx_message_comments') + 1
+          # If we're asking for a comment fragment, show that specific one.
+          msg.send parseBasecampResponse('messagecomment', heard_comment_id, message_json)
     else
       # Get the discussion detail from the API.
       getBasecampRequest msg, "projects/#{heard_project}/messages/#{heard_message}.json", (err, res, body) ->
-        track robot, "expand", "message"
-        robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
-        msg.send parseBasecampResponse('message', 0, JSON.parse body)
+        message_json = JSON.parse body || null
+        t = type message_json
+        if (t == 'object')
+          track robot, "expand", "message"
+          robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
+          msg.send parseBasecampResponse('message', 0, message_json)
 
 ############################################################################
 # Functions.
