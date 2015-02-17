@@ -17,7 +17,7 @@ Renders
 ## Examples
 ### Individual todo
 In [Slack](http://slack.com/) individual todo URLs of the form `https://basecamp.com/1234567/projects/1234567/todos/123456789` with an assignee, due date and attachments look something like this
-![hubot-basecamp-demo-1](https://www.evernote.com/shard/s248/sh/ea533ec6-80d3-45f6-9c6e-ecf75b587a99/e2e54957ab4be5830255b7507876dd38/deep/0/test---TEN7-Slack.png)
+![hubot-basecamp-demo-1](https://www.evernote.com/shard/s248/sh/ef176564-c382-47ab-9f4f-86211d2dde68/3178dd932a8fd6870f254a2d5c274cb4/deep/0/Slack.png)
 
 ### Discussion with specific comment
 You can also just extract a particular comment from a discussion (or a todo) by including the fragment in the URL. So, something like `https://basecamp.com/1234567/projects/1234567/messages/12345678#comment_123456789` looks something like this
