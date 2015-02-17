@@ -168,38 +168,28 @@ getCommentID = (url) ->
 # Parse a response and format nicely.
 parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
 
-  # Figure out which route to take for rendering purposes.
-  switch msgtype
-    when "todolist"
-      rendertype = "todolist"
-    when "todo"
-      if (commentid > 0)
-        rendertype = "todocomment"
-      else
-        rendertype = "todo"
-    when "message"
-      if (commentid > 0)
-        rendertype = "messagecomment"
-      else
-        rendertype = "message"
-
   # What we're rendering.
-  switch rendertype
+  switch msgtype
 
     when "todolist"
       m = "*#{body.name}* todo list"
       m = m + "\n#{body.completed_count} completed, #{body.remaining_count} remaining"
 
     when "todo"
+      # The todo itself
       m = "*#{body.content}*"
+      # Whether the todo was to-done.
       if (body.completed)
         m = m + " (COMPLETED)"
+      # Which todo list this item belongs to.
       if (todolist_name)
         m = m + "\nfrom #{todolist_name}"
+      # When the todo is due, if there's a date.
       if (body.due_at)
         # Make sure dataformat converts to UTC time so pretty dates are correct.
         due = dateformat(body.due_at, "ddd, mmm d", true)
         m = m + "\nDue on #{due}"
+      # The attachment(s) uploaded with the original item.
       attcnt = body.attachments.length
       if (attcnt > 0)
         if (attcnt == 1)
@@ -208,71 +198,37 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
           m = m + "\n_ #{attcnt} files: _"
         for att in body.attachments
           m = m + "\n> #{att.app_url}|#{att.name} "
+      # Who this todo was assigned to, if anyone.
       if (body.assignee)
         m = m + "\n_ Assigned to #{body.assignee.name} _"
+      # The latest comment, or a specific one if requested.
       if (body.comments)
-        latest = body.comments.pop()
-        t = type latest
-        if (t == 'object')
-          comment = totxt.fromString(latest.content, { wordwrap: 70 });
-          if (latest.created_at)
-            created = dateformat(latest.created_at, "ddd, mmm d h:MMt")
-          if (comment != 'null')
-            m = m + "\nThe latest comment was made by #{latest.creator.name} on #{created}:"
-            m = m + "\n```\n#{comment}\n```"
-          else
-            m = m + "\nThe latest comment was _ empty _ and made by #{latest.creator.name} on #{created}."
-          lstattcnt = latest.attachments.length
-          if (lstattcnt > 0)
-            if (lstattcnt == 1)
-              m = m + "\n_ 1 file: _"
-            else
-              m = m + "\n_ #{lstattcnt} files: _"
-            for att in latest.attachments
-              m = m + "\n> #{att.app_url}|#{att.name} "
-
-    when "todocomment"
-      m = "*#{body.content}*"
-      if (body.completed)
-        m = m + " (COMPLETED)"
-      if (todolist_name)
-        m = m + "\nfrom #{todolist_name}"
-      if (body.due_at)
-        # Make sure dataformat converts to UTC time so pretty dates are correct.
-        due = dateformat(body.due_at, "ddd, mmm d", true)
-        m = m + "\nDue on #{due}"
-      attcnt = body.attachments.length
-      if (attcnt > 0)
-        if (attcnt == 1)
-          m = m + "\n_ 1 file: _"
+        if (commentid > 0)
+          # A specific comment.
+          for com in body.comments
+            if ( parseInt(com.id) == parseInt(commentid) )
+              comment_to_show = com
         else
-          m = m + "\n_ #{attcnt} files: _"
-        for att in body.attachments
-          m = m + "\n> #{att.app_url}|#{att.name} "
-      if (body.assignee)
-        m = m + "\n_ Assigned to #{body.assignee.name} _"
-      if (body.comments)
-        # Extract the comment we want.
-        for com in body.comments
-          if ( parseInt(com.id) == parseInt(commentid) )
-            specific_comment = com
-        t = type specific_comment
+          # The latest comment.
+          comment_to_show = body.comments.pop()
+        t = type comment_to_show
         if (t == 'object')
-          comment = totxt.fromString(specific_comment.content, { wordwrap: 70 });
-          if (specific_comment.created_at)
-            created = dateformat(specific_comment.created_at, "ddd, mmm d h:MMt")
+          comment = totxt.fromString(comment_to_show.content, { wordwrap: 70 });
+          if (comment_to_show.created_at)
+            created = dateformat(comment_to_show.created_at, "ddd, mmm d h:MMt")
           if (comment != 'null')
-            m = m + "\nSpecific comment \##{commentid} was made by #{specific_comment.creator.name} on #{created}:"
+            if (commentid > 0)
+              m = m + "\nComment \##{commentid} was left by #{comment_to_show.creator.name} on #{created}:"
+            else
+              m = m + "\nThe latest comment was left by #{comment_to_show.creator.name} on #{created}:"
             m = m + "\n```\n#{comment}\n```"
-          else
-            m = m + "\nThat specific comment was _ empty _ and made by #{specific_comment.creator.name} on #{created}."
-          lstattcnt = specific_comment.attachments.length
-          if (lstattcnt > 0)
-            if (lstattcnt == 1)
+          comattcnt = comment_to_show.attachments.length
+          if (comattcnt > 0)
+            if (comattcnt == 1)
               m = m + "\n_ 1 file: _"
             else
-              m = m + "\n_ #{lstattcnt} files: _"
-            for att in specific_comment.attachments
+              m = m + "\n_ #{comattcnt} files: _"
+            for att in comment_to_show.attachments
               m = m + "\n> #{att.app_url}|#{att.name} "
 
     when "message"
