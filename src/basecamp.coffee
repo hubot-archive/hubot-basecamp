@@ -269,31 +269,6 @@ parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
             for att in latest.attachments
               m = m + "\n> #{att.app_url}|#{att.name} "
 
-    when "messagecomment"
-      m = "*#{body.subject}*"
-      if (body.comments)
-        # Extract the comment we want.
-        for com in body.comments
-          if ( parseInt(com.id) == parseInt(commentid) )
-            specific_comment = com
-        t = type specific_comment
-        if (t == 'object')
-          comment = totxt.fromString(specific_comment.content, { wordwrap: 70 });
-          if (specific_comment.created_at)
-            created = dateformat(specific_comment.created_at, "ddd, mmm d h:MMt")
-          if (comment != 'null')
-            m = m + "\nSpecific comment \##{commentid} was made by #{specific_comment.creator.name} on #{created}:"
-            m = m + "\n```\n#{comment}\n```"
-          else
-            m = m + "\nThat specific comment was _ empty _ and made by #{specific_comment.creator.name} on #{created}."
-          lstattcnt = specific_comment.attachments.length
-          if (lstattcnt > 0)
-            if (lstattcnt == 1)
-              m = m + "\n_ 1 file: _"
-            else
-              m = m + "\n_ #{lstattcnt} files: _"
-            for att in specific_comment.attachments
-              m = m + "\n> #{att.app_url}|#{att.name} "
   m
 
 
