@@ -32,7 +32,7 @@ user = process.env.HUBOT_BCX_USERNAME
 pass = process.env.HUBOT_BCX_PASSWORD
 
 # Constants.
-VERSION = "v0.5.3"
+VERSION = "v0.5.4"
 
 # No ID is set.
 unless id?
