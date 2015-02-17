@@ -95,7 +95,7 @@ module.exports = (robot) ->
               todolist_name = todolist_json.name
               track robot, "expand", "todo"
               robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
-              msg.send parseBasecampResponse('todo', heard_comment_id, todo_json, todolist_name)
+              msg.send parseBasecampResponse('todo', todo_json, heard_comment_id, todolist_name)
 
   # Display the todo list name and item counts.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todolists\/(\d+)/, (msg) ->
@@ -110,7 +110,7 @@ module.exports = (robot) ->
         if (t == 'object')
           track robot, "expand", "todolist"
           robot.brain.set 'bcx_todolists', robot.brain.get('bcx_todolists') + 1
-          msg.send parseBasecampResponse('todolist', 0, todolist_json)
+          msg.send parseBasecampResponse('todolist', todolist_json)
 
   # Display the initial message of a discussion. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/messages\/(\d+)/, (msg) ->
@@ -126,7 +126,7 @@ module.exports = (robot) ->
         if (t == 'object')
           track robot, "expand", "message"
           robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
-          msg.send parseBasecampResponse('message', heard_comment_id, message_json)
+          msg.send parseBasecampResponse('message', message_json, heard_comment_id)
 
 ############################################################################
 # Functions.
@@ -166,7 +166,7 @@ getCommentID = (url) ->
 
 
 # Parse a response and format nicely.
-parseBasecampResponse = (msgtype, commentid, body, todolist_name) ->
+parseBasecampResponse = (msgtype, body, commentid, todolist_name) ->
 
   # Figure out which route to take for rendering purposes.
   switch msgtype
