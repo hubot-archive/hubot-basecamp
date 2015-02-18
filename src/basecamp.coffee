@@ -32,7 +32,7 @@ user = process.env.HUBOT_BCX_USERNAME
 pass = process.env.HUBOT_BCX_PASSWORD
 
 # Constants.
-VERSION = "v0.5.4"
+VERSION = "v0.5.5"
 
 # No ID is set.
 unless id?
@@ -76,7 +76,7 @@ module.exports = (robot) ->
   # Display a single todo item. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todos\/(\d+)/, (msg) ->
     # Parse out the URL parts and only for those matching the configured account.
-    if (parseInt(id) == parseInt(msg.match[1]))
+    if (parseInt(id) == parseInt(msg.match[1]) && msg.match['input'][-2..] != '&x')
       heard_project = msg.match[2]
       heard_todo = msg.match[3]
       heard_comment_id = getCommentID msg.match['input']
@@ -100,7 +100,7 @@ module.exports = (robot) ->
   # Display the todo list name and item counts.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/todolists\/(\d+)/, (msg) ->
     # Parse out the URL parts and only for those matching the configured account.
-    if (parseInt(id) == parseInt(msg.match[1]))
+    if (parseInt(id) == parseInt(msg.match[1]) && msg.match['input'][-2..] != '&x')
       heard_project = msg.match[2]
       heard_list = msg.match[3]
       # Get the todo list detail from the API.
@@ -115,7 +115,7 @@ module.exports = (robot) ->
   # Display the initial message of a discussion. Include latest or a specific comment.
   robot.hear /https:\/\/basecamp\.com\/(\d+)\/projects\/(\d+)\/messages\/(\d+)/, (msg) ->
     # Parse out the URL parts and only for those matching the configured account.
-    if (parseInt(id) == parseInt(msg.match[1]))
+    if (parseInt(id) == parseInt(msg.match[1]) && msg.match['input'][-2..] != '&x')
       heard_project = msg.match[2]
       heard_message = msg.match[3]
       heard_comment_id = getCommentID msg.match['input']
