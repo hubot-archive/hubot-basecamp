@@ -14,25 +14,15 @@ Renders
 * direct links to associated files
 * todo list summary
 
-## Examples
-### Individual todo
-In [Slack](http://slack.com/) individual todo URLs of the form `https://basecamp.com/1234567/projects/1234567/todos/123456789` with an assignee, due date and attachments look something like this
-![hubot-basecamp-demo-1](https://www.evernote.com/shard/s248/sh/ef176564-c382-47ab-9f4f-86211d2dde68/3178dd932a8fd6870f254a2d5c274cb4/deep/0/Slack.png)
-
-### Discussion with specific comment
-You can also just extract a particular comment from a discussion (or a todo) by including the fragment in the URL. So, something like `https://basecamp.com/1234567/projects/1234567/messages/12345678#comment_123456789` looks something like this
-![hubot-basecamp-demo-2](https://www.evernote.com/shard/s248/sh/a01ee471-c158-4d2d-9804-6181634c3df3/46ff5569183ec0708133de930b9b4039/deep/0/test---TEN7-Slack.png)
-
-
-### Todo list
-Summary information for a todolist is also provided:
-![hubot-basecamp-demo-3](https://www.evernote.com/shard/s248/sh/f07bf604-e5e5-42e3-9cf9-ce0eab605014/702a138455f6377de34ad27fb5e84bad/deep/0/test---TEN7-Slack.png)
 
 ## Installation
 
 In hubot project repo, run:
 
 `npm install hubot-basecamp --save`
+
+[![NPM](https://nodei.co/npm/hubot-basecamp.png?downloads=true&stars=true)](https://www.npmjs.com/package/hubot-basecamp)
+
 
 Then add **hubot-basecamp** to your `external-scripts.json`:
 
@@ -55,6 +45,21 @@ You can use your own username (or email address) and password in the configurati
 * create a user for hubot in your Basecamp project
 * add this user to all projects
 * add this user to any templates you have so hubot gets added to new template based projects
+
+
+## Examples
+### Individual todo
+In [Slack](http://slack.com/) individual todo URLs of the form `https://basecamp.com/1234567/projects/1234567/todos/123456789` with an assignee, due date and attachments look something like this
+![hubot-basecamp-demo-1](https://www.evernote.com/shard/s248/sh/ef176564-c382-47ab-9f4f-86211d2dde68/3178dd932a8fd6870f254a2d5c274cb4/deep/0/Slack.png)
+
+### Discussion with specific comment
+You can also just extract a particular comment from a discussion (or a todo) by including the fragment in the URL. So, something like `https://basecamp.com/1234567/projects/1234567/messages/12345678#comment_123456789` looks something like this
+![hubot-basecamp-demo-2](https://www.evernote.com/shard/s248/sh/a01ee471-c158-4d2d-9804-6181634c3df3/46ff5569183ec0708133de930b9b4039/deep/0/test---TEN7-Slack.png)
+
+
+### Todo list
+Summary information for a todolist is also provided:
+![hubot-basecamp-demo-3](https://www.evernote.com/shard/s248/sh/f07bf604-e5e5-42e3-9cf9-ce0eab605014/702a138455f6377de34ad27fb5e84bad/deep/0/test---TEN7-Slack.png)
 
 ## Issues and Feature Requests
 If you're having an issue, please [describe it](https://github.com/hubot-scripts/hubot-basecamp/issues/) to me, and I'll do my best to address is.
