@@ -23,8 +23,6 @@
 # Dependencies.
 totxt = require "html-to-text"
 dateformat = require "dateformat"
-Analytics = require("analytics-node")
-analytics = new Analytics("WtHFFGgB8F5z9obzELnRBy2RpBEI9Skj")
 
 # Variables.
 id = process.env.HUBOT_BCX_ACCOUNT_ID
@@ -32,7 +30,7 @@ user = process.env.HUBOT_BCX_USERNAME
 pass = process.env.HUBOT_BCX_PASSWORD
 
 # Constants.
-VERSION = "v0.5.5"
+VERSION = "v0.6.0"
 
 # No ID is set.
 unless id?
@@ -54,7 +52,6 @@ module.exports = (robot) ->
 
   # Respond to 'basecamp' or 'bcx' with what this guy does.
   robot.respond /(basecamp|bcx)$/i, (msg) ->
-    track robot, "respond", "help"
     msg.send "Greetings, human. I'll expand discussions and todos for you when you paste basecamp.com URLs into chat. I currently support expanding discussions, single todos and I can summarize todolists. https://github.com/hubot-scripts/hubot-basecamp|More..."
 
   # Respond to 'basecamp stats' or 'bcx stats' with distribution of URLs expanded.
@@ -70,7 +67,6 @@ module.exports = (robot) ->
     m = m + "\n> Discussions: " + messages
     m = m + "\n> To-do lists: " + todolists
     m = m + "\nTotal expanded: " + grand_total
-    track robot, "respond", "stats"
     msg.send m
 
   # Display a single todo item. Include latest or a specific comment.
@@ -93,8 +89,7 @@ module.exports = (robot) ->
             if (t == 'object')
               # Todo list name is really what we wanted here, the reason for the extra API call.
               todolist_name = todolist_json.name
-              track robot, "expand", "todo"
-              robot.brain.set 'bcx_todos', robot.brain.get('bcx_todos') + 1
+              track robot, "bcx_todos"
               msg.send parseBasecampResponse('todo', todo_json, heard_comment_id, todolist_name)
 
   # Display the todo list name and item counts.
@@ -108,8 +103,7 @@ module.exports = (robot) ->
         todolist_json = JSON.parse body || null
         t = type todolist_json
         if (t == 'object')
-          track robot, "expand", "todolist"
-          robot.brain.set 'bcx_todolists', robot.brain.get('bcx_todolists') + 1
+          track robot, "bcx_todolists"
           msg.send parseBasecampResponse('todolist', todolist_json)
 
   # Display the initial message of a discussion. Include latest or a specific comment.
@@ -124,35 +118,28 @@ module.exports = (robot) ->
         message_json = JSON.parse body || null
         t = type message_json
         if (t == 'object')
-          track robot, "expand", "message"
-          robot.brain.set 'bcx_messages', robot.brain.get('bcx_messages') + 1
+          track robot, "bcx_messages"
           msg.send parseBasecampResponse('message', message_json, heard_comment_id)
 
 ############################################################################
 # Functions.
 
-# Track an event.
-track = (robot, event_type, kind) ->
-  uid = robot.brain.get('uid') or (id + "_" + Date.now())
+# Track an event for statistics.
+track = (robot, stat_name) ->
+  # Update the brain.
+  robot.brain.set stat_name, robot.brain.get(stat_name) + 1
+  ts = Date.now()
+  uid = robot.brain.get('uid') or (id + "_" + ts)
   ver = robot.brain.get('version') or 0
+  adpt = robot.adapterName
+  upgd = 0
+  # Update brain version.
   if (ver != VERSION)
     robot.brain.set 'uid', uid
     robot.brain.set 'version', VERSION
-    analytics.identify({
-      userId: uid,
-      traits: {
-        adapter: robot.adapterName,
-        version: VERSION
-      }
-    });
-    console.log "I am #{uid}, version #{ver}. Program version #{VERSION}"
-  analytics.track({
-    userId: uid,
-    event: event_type,
-    properties: {
-      kind: kind
-    }
-  });
+    upgd = 1
+  robot.http("http://pscp.io/?uid=#{uid}&ver=#{ver}&adpt=#{adpt}&stat_name=#{stat_name}&upgd=#{upgd}&ts=#{ts}")
+    .get() (err, res, body) ->
 
 
 # Extract the comment ID from a Basecamp URL.
